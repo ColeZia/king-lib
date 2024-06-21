@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package api.skeleton3.service.v1;
+
+//import "google/protobuf/descriptor.proto";
+import "google/api/annotations.proto";
+//import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "gl.king.im/king-lib/framework/test/api/skeleton3/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.v1";
+
+//后端授权服务
+service Skeleton3Service{
+  rpc Get (GetRequest) returns (GetReply){
+
+    option (google.api.http) = {
+      post: "/Skeleton3/Service/v1/Get",
+      body: "*",
+    };
+  }
+}
+
+message GetRequest{
+}
+
+message GetReply{
+  string res = 1;
+}

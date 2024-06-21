@@ -1,0 +1,7 @@
+data:
+  config:
+    #env: Dev
+    #namespace: namespaceABC
+    etcd_sources: 
+      - endpoints:
+          - 10.1.69.186:2379

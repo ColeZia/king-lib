@@ -1,0 +1,294 @@
+syntax = "proto3";
+package conf;
+
+option go_package = "gl.king.im/king-lib/framework/config;config";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Service service = 3;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message Prof {
+    bool open = 1;
+    string network = 2;
+    string addr = 3;
+    google.protobuf.Duration timeout = 4;
+  }
+  message Healthy {
+    bool open = 1;
+    string network = 2;
+    string addr = 3;
+    google.protobuf.Duration timeout = 4;
+  }
+  message Monitor {
+    bool open = 1;
+    string network = 2;
+    string addr = 3;
+    google.protobuf.Duration timeout = 4;
+  }
+
+  HTTP http = 1;
+  GRPC grpc = 2;
+  Prof prof = 3;
+  Healthy healthy = 4;
+  Monitor monitor = 5;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
+  }
+  message Redis {
+    string network = 1;
+    string addr = 2;
+    string password = 3;
+    google.protobuf.Duration read_timeout = 4;
+    google.protobuf.Duration write_timeout = 5;
+  }
+  Database database = 1;
+  Redis redis = 2;
+
+  message Config {
+    message SrcType{
+      enum Enums{
+        Unknown = 0;
+        File = 1;
+        Etcd = 2;
+        Apollo = 3;
+      }
+    }
+
+    message Format{
+      enum Enums{
+        Unknown = 0;
+        Yaml = 1;
+        Json = 2;
+      }
+    }
+
+    message Env{
+      enum Enums{
+        Unknown = 0;
+        Local = 100;
+        Dev = 200;
+        Test = 300;
+        Alpha = 400;
+        Beta = 500;
+        Prod = 600;
+      }
+    }
+    
+    message EtcdSource {
+      //配置的绝对路径
+      string absolute_path = 100;
+      bool with_prefix = 200;
+      repeated string endpoints = 300;
+      google.protobuf.Duration dial_timeout = 400;
+      //公共配置的路径是否使用命名空间
+      bool use_namespace_for_common = 600;
+      //公共配置的绝对路径
+      string common_absolute_path = 700;
+    }
+
+    //SrcType.Enums src_type = 100;
+    Format.Enums format = 200;
+    repeated EtcdSource etcd_sources = 300;
+    Env.Enums env = 400;
+    string namespace = 500;
+    //公共模块配置
+    repeated string modules = 600;
+    string modules_base_path = 700;
+    //是否检测预发布环境
+    message PreEnv{
+      enum DetectMethod{
+        Unknown = 0;
+        OSEnv = 100;
+      }
+    }
+    PreEnv.DetectMethod pre_env_detect_method = 800;
+    //启用预发布配置的情况下，其基础地址路径
+    string pre_base_path = 900;
+    //启用预发布配置的情况下，预发布环境变量名
+    string pre_os_env_name = 1000;
+  }
+
+  Config config = 300;
+}
+
+//服务相关
+message Service{
+  string env = 1;
+  string secret = 2;
+  bool auth_close = 3;
+  string k8s_namespace = 40;
+  string discovery_method = 41;
+  string registry_method = 42;
+
+  //注册中心
+  message Registry{
+    string addr = 1;
+  }
+  message Registrys{
+    Registry consul = 1;
+    Registry etcd = 2;
+    Registry endpoint = 3;
+  }
+  Registrys registrys = 4;
+
+  //追踪
+  message Trace{
+    string endpoint = 1;
+  }
+  message Traces{
+    bool open = 1;
+    Trace jaeger = 2;
+  }
+  Traces traces = 5;
+
+  //预警
+  message WorkWechat{
+    string hook = 1;
+    bool debug = 2;
+  }
+  
+  message Alert{
+    message Feishu{
+      string hook = 1;
+      bool debug = 2;
+    }
+
+    WorkWechat work_wechat = 1;
+    Feishu feishu = 2;
+  }
+
+  Alert alert = 6;
+  
+  //网关地址
+  message Gateway{
+    string addr = 1;
+    string admin_key = 2;
+  }
+  message Gateways {
+    Gateway apisix = 1;
+    Gateway kong = 2;
+  }
+
+  Gateways gateways = 7;
+
+  //cors
+  repeated string allow_origin_list = 8;
+
+  message Cors{
+    repeated string allow_origin_list = 10;
+    repeated string allow_headers = 20;
+    uint32 allow_headers_mode = 30;//0为不设置/默认，1为追加，2为覆盖，此模式下allow_headers为空列表也会进行覆盖
+    repeated string allow_methods = 90;
+    uint32 allow_credentials = 100; //0为不设置/默认，1为true，2为false
+  }
+
+  Cors cors = 9;
+
+  //bool debug = 9;
+
+  //uint32 log_level = 10;
+
+  message Log{
+    message LogLevel{
+      enum TYPE{
+        Unknown = 0;
+        Debug = 1;
+        Info = 2;
+        Warn = 3;
+        Error = 4;
+        Panic = 5;
+        Fatal = 6;
+      }
+    }
+
+    message STORAGE{
+      enum TYPE{
+        Unknown = 0;
+        FILE = 1;
+        ES = 2;
+        STD_OUT = 3;
+      }
+    }
+
+    message File{
+      string base_path = 1;
+      LogLevel.TYPE enable_level = 4;
+    }
+   
+    message ES{
+      repeated string addrs = 1;
+      string username = 2;
+      string password = 3;
+      LogLevel.TYPE enable_level = 4;
+    }
+
+    message StdOut{
+      LogLevel.TYPE enable_level = 4;
+    }
+
+    repeated STORAGE.TYPE storage = 100;
+    File file = 200;
+    ES e_s = 300;
+    StdOut std_out = 400;
+
+    bool use_zlogger = 500;
+
+    LogLevel.TYPE enable_level = 600;
+  }
+
+  Log log = 20;
+
+  bool close_metric = 300;
+
+  //是否部署在外部网络---目前已废弃，请勿继续使用
+  bool in_external_network = 400;
+
+  message AuthMethod{
+    enum Enums {
+        Default = 0;//等同于InsideGrpc
+        OutsideHttp = 2; //服务所在网络外-http
+        
+        //目前主要上面两种，下面的暂时不用
+        //InsideHttp = 3;  //服务所在网络内-http
+        //OutsideGrpc = 4; //服务所在网络外-grpc
+    }
+  } 
+
+  AuthMethod.Enums user_auth_method = 500;
+  AuthMethod.Enums svc_auth_method = 600;
+
+  message Sdn{
+    string proxy_url = 1;
+  }
+
+  Sdn sdn = 700;
+
+  message DependencySvc{
+    repeated string endpoints = 1;
+    bool directly_path = 2;
+    bool use_sdn_proxy = 3;
+  }
+
+  map<string,DependencySvc> dependency_http_services = 800;
+
+  map<string,string> service_alias = 900;
+}

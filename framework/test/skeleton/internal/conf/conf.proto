@@ -1,0 +1,89 @@
+syntax = "proto3";
+package kratos.api;
+
+option go_package = "boss-test/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Biz biz = 3;
+  WechatWork wechat_work = 4;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
+  }
+  message AuthDb {
+    string driver = 1;
+    string source = 2;
+  }
+  message AdminDb {
+    string driver = 1;
+    string source = 2;
+  }
+  message Redis {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration read_timeout = 3;
+    google.protobuf.Duration write_timeout = 4;
+  }
+  message TimeTicker {
+    uint64 time_interval = 1;
+  }
+  Database database = 1;
+  Redis redis = 2;
+  TimeTicker time_ticker = 8;
+}
+
+message Biz{
+  message Ldap{
+    string host = 1;
+    uint32 port = 2;
+  }
+  Ldap ldap = 4;
+
+  message Saml{
+    message SP{
+      string entity_id = 1;
+      string root_url = 2;
+      string cert = 3;
+      string key = 4;
+    }
+
+    message IDP{
+      string load_metadata_method = 1;
+      string metadata_file = 2;
+      string metadata_url = 3;
+    }
+
+    SP s_p = 1;
+    IDP i_d_p = 2;
+  }
+
+  Saml saml = 5;
+}
+
+message WechatWork {
+  string corp_id = 1;
+  int64 agent_id = 2;
+  string secret = 3;
+}

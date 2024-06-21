@@ -1,0 +1,22 @@
+/vendor
+/bin
+trigger-travis.sh
+/*.tgz
+/*.zip
+
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# IDE-specific settings files
+.idea
+
+/protoc-gen-gorm

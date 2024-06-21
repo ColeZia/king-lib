@@ -1,0 +1,6 @@
+data:
+  config:
+    #env: Alpha
+    etcd_sources: 
+      - endpoints:
+          - 10.1.169.40:2379
